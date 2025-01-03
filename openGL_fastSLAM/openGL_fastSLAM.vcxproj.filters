@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{bff7eafe-83db-411e-8b90-419fd72a80b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{8924b525-ad93-406f-be74-b3b3a8b6fc7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Markov">
+      <UniqueIdentifier>{95ae87bc-2885-4167-8728-ffe8530605f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fastSLAM">
+      <UniqueIdentifier>{4a108f31-a0c5-4446-b906-4bc83192a908}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="params.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowClass.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="InterfaceController.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="MarkovClasses.h">
+      <Filter>Markov</Filter>
+    </ClInclude>
+    <ClInclude Include="FastSlamClasses.h">
+      <Filter>fastSLAM</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WindowClass.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -15,9 +15,6 @@
     <Filter Include="UI">
       <UniqueIdentifier>{8924b525-ad93-406f-be74-b3b3a8b6fc7c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Markov">
-      <UniqueIdentifier>{95ae87bc-2885-4167-8728-ffe8530605f9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="fastSLAM">
       <UniqueIdentifier>{4a108f31-a0c5-4446-b906-4bc83192a908}</UniqueIdentifier>
     </Filter>
@@ -31,9 +28,6 @@
     </ClInclude>
     <ClInclude Include="InterfaceController.h">
       <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="MarkovClasses.h">
-      <Filter>Markov</Filter>
     </ClInclude>
     <ClInclude Include="FastSlamClasses.h">
       <Filter>fastSLAM</Filter>

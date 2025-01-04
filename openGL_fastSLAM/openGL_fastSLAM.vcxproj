@@ -133,7 +133,6 @@
   <ItemGroup>
     <ClInclude Include="FastSlamClasses.h" />
     <ClInclude Include="InterfaceController.h" />
-    <ClInclude Include="MarkovClasses.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="WindowClass.h" />
   </ItemGroup>

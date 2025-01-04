@@ -127,12 +127,8 @@ public:
 
 
 		// Gauss
-
-		//
 		const double twoPi = 2.0 * 3.1415926;
 		const int d = 2;
-
-		
 		double detS = S.determinant();
 		if (detS < 1e-10) detS = 1e-10;
 		double normFactor = 1.0 / (std::sqrt(std::pow(twoPi, d) * detS));
@@ -284,9 +280,7 @@ public:
 			double z2 = distN(gen);
 			double z3 = distN(gen);
 			Eigen::Vector3d z(z1, z2, z3);
-
 			Eigen::Vector3d noise = A * z;  // shape 3x1  (nx, ny, ntheta)
-
 
 			// Az + X
 			Eigen::Vector3d moveWithNoise = idealMove + noise;

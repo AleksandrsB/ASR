@@ -8,6 +8,7 @@ HDC g_hDC;
 HGLRC g_hRC;
 HWND g_hWnd;
 
+uint64_t stepCounter = 0;
 
 std::vector<Button*> Button::allButtons;
 
@@ -28,7 +29,7 @@ void OnApplyFilter()
 
 void OnSendMovement(const std::string s)
 {
-	if (s == "Forward") ep.env->step(20,0);
+	if (s == "Forward") ep.env->step(5,0);
 	else if (s == "Turn left") ep.env->step(0, -0.1);
 	else if (s == "Turn right") ep.env->step(0, 0.1);
 	normalize();
@@ -106,6 +107,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (wParam == 'W') OnSendMovement("Forward");
 		else if (wParam == 'A') OnSendMovement("Turn left");
 		else if (wParam == 'D') OnSendMovement("Turn right");
+		
 		break;
 	case WM_DESTROY:
 		PostQuitMessage(0);

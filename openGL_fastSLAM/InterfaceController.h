@@ -7,6 +7,7 @@
 #include <vector>
 #include <fstream>
 #include "FastSlamClasses.h"
+#include <format>
 
 void drawBorder(int x, int y, int width, int height)
 {
@@ -210,6 +211,11 @@ public:
 
 	TextRenderer* textRenderer = nullptr;
 
+	Landmark* hoveredLandmark = nullptr;
+	int hoveredLandmarkID = -1;
+	Particle* hoveredLandmarkOwner = nullptr;
+	int hoveredLandmarkOwnerID = -1;
+
 public:
 	EnvironmentUIController()
 	{
@@ -229,13 +235,55 @@ public:
 
 	void checkHovered(int x, int y)
 	{
+		double mouseX = x - env->rd.posX;
+		double mouseY = y - env->rd.posY;
 
+		double minDist = 10;
+
+		int pId = 0;
+
+		for (Particle* p : env->particles)
+		{
+			int lId = 0;
+			for (Landmark& land : p->obstacleHypothesis)
+			{
+				double distX = abs(p->posX + land.mean(0) - mouseX);
+				double distY = abs(p->posY + land.mean(1) - mouseY);
+				double dist = sqrt(distX * distX + distY * distY);
+
+				if (dist < minDist)
+				{
+					hoveredLandmark = &land;
+					hoveredLandmarkID = lId;
+					hoveredLandmarkOwner = p;
+					hoveredLandmarkOwnerID = pId;
+				}
+				lId++;
+			}
+			pId++;
+		}
 		return;
 	}
 
 	void render()
 	{
 		if (!textRenderer) return;
+
+		std::string steps = "Step: ";
+		steps += std::to_string(env->stepCounter);
+		textRenderer->renderText(steps.c_str(), env->rd.posX, env->rd.posY - 5, false);
+		int yPos = 190;
+		for (size_t i = 0; i < 10; i++)
+		{
+			std::string text = std::format("Particle {}:", i);
+			textRenderer->renderText(text.c_str(), 20, yPos, false);
+			yPos += 14;
+			text = std::format("dRobotX: {}, dRobotY: {}",
+				std::to_string(env->particles[i]->posX - env->robot->posX), std::to_string(env->particles[i]->posY - env->robot->posY));
+			textRenderer->renderText(text.c_str(), 20, yPos, false);
+			yPos += 14;
+		}
+		yPos += 20;
 
 		// draw border
 		glColor3f(0.4f, 0.4f, 0.4f);
@@ -268,13 +316,52 @@ public:
 			glColor3f(0.5f, 0.1f, 0.1f); // Particle
 			drawCircle(p->posX, p->posY, 5, 4);
 
-			for (Obstacle& o : p->obstacleHypothesis)
+			for (Landmark& land : p->obstacleHypothesis)
 			{
-				glColor3f(0.0f, 1.0f, 0.1f); // Obstacle color
-				drawCircle(o.posX + o.mean(0), o.posY + o.mean(1), 5, 4);
+				float red = 0; float green = 0;
+				float value = (float)land.weight;
+				if (value <= 0.5f) {
+					red = 1.0f;
+					green = value * 2.0f;
+				}
+				else {
+					red = 1.0f - (value - 0.5f) * 2.0f;
+					green = 1.0f;
+				}
+
+				glColor3f(red, green, 0.1f); // Obstacle color
+				drawCircle(p->posX + land.mean(0), p->posY + land.mean(1), 5, 4);
 			}
 		}
+		glColor3f(0.0f, 0.0f, 0.0f);
+		std::string text = "Hovered landmark data: ";
+		textRenderer->renderText(text.c_str(), -env->rd.posX+20, yPos - env->rd.posY, false);
+		yPos += 14;
+		text = std::format("Landmark ID: {}, Owner: Particle{}", hoveredLandmarkID, hoveredLandmarkOwnerID);
+		textRenderer->renderText(text.c_str(), -env->rd.posX+20, yPos - env->rd.posY, false);
+		yPos += 14;
+		
 
+		if (hoveredLandmark)
+		{
+			text = std::format("Inovac. Y: ({}, {})", std::to_string(hoveredLandmark->Y(0)), std::to_string(hoveredLandmark->Y(1)));
+			textRenderer->renderText(text.c_str(), -env->rd.posX + 20, yPos - env->rd.posY, false);
+			yPos += 14;
+			text = std::format("Inovac.kovar S: ({})", std::to_string(hoveredLandmark->S(0)));
+			textRenderer->renderText(text.c_str(), -env->rd.posX + 20, yPos - env->rd.posY, false);
+			yPos += 14;
+			text = std::format("Kalman g. K: ({})", std::to_string(hoveredLandmark->K(0)));
+			textRenderer->renderText(text.c_str(), -env->rd.posX + 20, yPos - env->rd.posY, false);
+			yPos += 14;
+			glColor3f(0.0f, 0.8f, 0.8f);
+			glBegin(GL_LINES);
+			for (int i = 0; i < 2; i++) // horizontal
+			{
+				glVertex2f(hoveredLandmarkOwner->posX + hoveredLandmark->mean(0), hoveredLandmarkOwner->posY + hoveredLandmark->mean(1));
+				glVertex2f(env->obstacles[hoveredLandmarkID]->posX, env->obstacles[hoveredLandmarkID]->posY);
+			}
+			glEnd();
+		}
 
 		glPopMatrix();
 		return;
@@ -307,9 +394,9 @@ public:
 		m_sendMovement = OnSendMovement;
 
 		m_offsX = offsX; m_offsY = offsY;
-		m_bForward = new Button("Forward", eButtonType::SIMPLE, m_offsX + 60, m_offsY + 25, 60, 50);
-		m_bTurnLeft = new Button("Turn left", eButtonType::SIMPLE, m_offsX + 0, m_offsY + 75, 60, 50);
-		m_bTurnRight = new Button("Turn right", eButtonType::SIMPLE, m_offsX + 120, m_offsY + 75, 60, 50);
+		m_bForward = new Button("Forward(w)", eButtonType::SIMPLE, m_offsX + 70, m_offsY + 25, 70, 50);
+		m_bTurnLeft = new Button("Turn left(a)", eButtonType::SIMPLE, m_offsX + 0, m_offsY + 75, 70, 50);
+		m_bTurnRight = new Button("Turn right(d)", eButtonType::SIMPLE, m_offsX + 140, m_offsY + 75, 70, 50);
 
 		btns.push_back(m_bForward);
 		btns.push_back(m_bTurnLeft);
@@ -335,7 +422,7 @@ public:
 			textRenderer->renderText(b->name.c_str(), b->posX + b->width / 2.0, b->posY + b->height / 2.0);
 		}
 		glColor3f(0.4f, 0.4f, 0.4f);
-		drawBorder(m_offsX - 10, m_offsY - 10, 200, 150);
+		drawBorder(m_offsX - 10, m_offsY - 10, 230, 150);
 	}
 
 	void checkHovered(int x, int y)
